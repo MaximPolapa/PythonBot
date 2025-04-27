@@ -1,0 +1,33 @@
+name: Cleanup Generated Unit Tests
+
+on:
+  push:
+    branches:
+      - master
+    # Запускаємо тільки якщо коміт містить потрібний текст
+    paths:
+      - '**/test_generated.py'
+
+jobs:
+  clean_tests:
+    if: github.event.head_commit.message == 'Add generated unit tests by GenAI Unit Test Generator'
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Remove first and last line from test_generated.py
+      run: |
+        find . -type f -name "test_generated.py" | while read file; do
+          echo "Processing $file"
+          sed '1d;$d' "$file" > temp_file && mv temp_file "$file"
+        done
+
+    - name: Commit and push changes
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git add .
+        git commit -m "Cleaned up generated unit tests"
+        git push
