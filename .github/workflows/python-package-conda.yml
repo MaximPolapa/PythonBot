@@ -1,7 +1,7 @@
 name: Cleanup Generated Unit Tests
 
 on:
-  workflow_dispatch:   # Додає ручний запуск
+  workflow_dispatch:    
   push:
     branches:
       - master
@@ -10,27 +10,23 @@ on:
 
 jobs:
   clean_tests:
-    if: >
-      github.event_name == 'workflow_dispatch' || github.event.head_commit.message == 'Add generated unit tests by GenAI Unit Test Generator'
+    if: startsWith(github.event.head_commit.message, 'Add generated unit tests by GenAI Unit Test Generator')
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Remove first and last line from test_generated.py
-      run: |
-        find . -type f -name "test_generated.py" | while read file; do
-          echo "Processing $file"
-          sed '1d;$d' "$file" > temp_file && mv temp_file "$file"
-        done
+      - name: Remove first and last line from test_generated.py
+        run: |
+          find . -type f -name "test_generated.py" | while read file; do
+            echo "Cleaning $file"
+            sed '1d;$d' "$file" > temp_file && mv temp_file "$file"
+          done
 
-    - name: Commit and push changes
-      run: |
-        git config user.name "github-actions[bot]"
-        git config user.email "github-actions[bot]@users.noreply.github.com"
-        git add .
-        git commit -m "Cleaned up generated unit tests" || echo "No changes to commit"
-        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-        git push origin HEAD:${{ github.ref_name }}
-
+      - name: Show result (for checking)
+        run: |
+          find . -type f -name "test_generated.py" | while read file; do
+            echo "Result for $file:"
+            cat "$file"
+          done
