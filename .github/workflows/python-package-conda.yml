@@ -1,17 +1,17 @@
 name: Cleanup Generated Unit Tests
 
 on:
-  workflow_dispatch:   # 👈 Додали можливість вручну!
+  workflow_dispatch:   # Додає ручний запуск
   push:
     branches:
       - master
     paths:
       - '**/test_generated.py'
 
-
 jobs:
   clean_tests:
-    if: github.event.head_commit.message == 'Add generated unit tests by GenAI Unit Test Generator'
+    if: >
+      github.event_name == 'workflow_dispatch' || github.event.head_commit.message == 'Add generated unit tests by GenAI Unit Test Generator'
     runs-on: ubuntu-latest
 
     steps:
