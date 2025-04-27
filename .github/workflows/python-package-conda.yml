@@ -1,7 +1,7 @@
 name: Cleanup Generated Unit Tests
 
 on:
-  workflow_dispatch:    
+  workflow_dispatch:    # 👈 вручну запускати
   push:
     branches:
       - master
@@ -10,7 +10,7 @@ on:
 
 jobs:
   clean_tests:
-    if: startsWith(github.event.head_commit.message, 'Add generated unit tests by GenAI Unit Test Generator')
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.head_commit.message, 'Add generated unit tests by GenAI Unit Test Generator')
     runs-on: ubuntu-latest
 
     steps:
